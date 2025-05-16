@@ -33,7 +33,7 @@ function Profiles() {
           aria-expanded={open ? 'true' : undefined}
         >
           <Avatar
-            sx={{ width: 30, height: 30 }}
+            sx={{ width: 36, height: 36 }}
             alt='enrrol avatar'
             src='https://th.bing.com/th/id/OIP.5hHgAzYlrF2DwEeXd6o__AHaE8?w=313&h=180&c=7&r=0&o=5&dpr=1.1&pid=1.7'
           />

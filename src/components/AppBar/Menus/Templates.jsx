@@ -5,12 +5,7 @@ import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
-import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
-import ContentCut from '@mui/icons-material/ContentCut'
-import ContentCopy from '@mui/icons-material/ContentCopy'
-import ContentPaste from '@mui/icons-material/ContentPaste'
-import Cloud from '@mui/icons-material/Cloud'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import Check from '@mui/icons-material/Check'
 
@@ -26,6 +21,7 @@ function Templates () {
   return (
     <Box>
       <Button
+        sx={ { color:'white' } }
         id="basic-button-templates "
         aria-controls={open ? 'basic-menu-recent' : undefined}
         aria-haspopup="true"
