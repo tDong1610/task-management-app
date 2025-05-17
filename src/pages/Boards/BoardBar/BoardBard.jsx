@@ -11,6 +11,7 @@ import AvatarGroup from '@mui/material/AvatarGroup'
 import Tooltip from '@mui/material/Tooltip'
 import Button from '@mui/material/Button'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import { capitalizeFirstLetter } from '~/utils/formatters'
 
 const MENU_STYLE={
   color: 'white',
@@ -26,7 +27,7 @@ const MENU_STYLE={
   }
 
 }
-function index() {
+function BoardBar({ board } ) {
   return (
     <Box sx={{
       width: '100%',
@@ -43,12 +44,12 @@ function index() {
         <Chip
           sx={MENU_STYLE}
           icon={<Dashboard />}
-          label="Trello App"
+          label={board?.title}
           onClick={() => {}}
         />
         <Chip sx={MENU_STYLE}
           icon={<VpnLockIcon />}
-          label="Puclic/Private Workspace"
+          label={capitalizeFirstLetter(board?.type)}
           onClick={() => { }}
         />
 
@@ -96,7 +97,7 @@ function index() {
             border: 'none',
             color: 'white',
             cursor: 'pointer',
-            '&:first-of-type': { bgcolor: '#a4b0be' },
+            '&:first-of-type': { bgcolor: '#a4b0be' }
           }
         }}>
           <Tooltip title="Remy Sharp">
@@ -129,4 +130,4 @@ function index() {
   )
 }
 
-export default index
+export default BoardBar
