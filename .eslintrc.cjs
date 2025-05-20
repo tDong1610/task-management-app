@@ -28,6 +28,7 @@ module.exports = {
 
 
     'no-console': 1, // Cảnh báo nếu dùng console.log
+    'no-extra-boolean-cast': 0, // Cảnh báo ép kiểu boolean không cần thiết
     'no-lonely-if': 1, // Cảnh báo if đứng 1 mình trong else
     'no-unused-vars': 1, // Cảnh báo biến không sử dụng
     'no-trailing-spaces': 1, // Cảnh báo dấu cách thừa cuối dòng
