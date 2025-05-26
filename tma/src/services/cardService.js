@@ -20,5 +20,5 @@ const createNew = async(reqBody) =>{
 
 
 export const cardService = {
-    createNew,
+    createNew
 }

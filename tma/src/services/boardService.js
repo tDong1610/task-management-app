@@ -22,20 +22,24 @@ const createNew = async(reqBody) =>{
 }
 
 const getDetails = async(boardId) =>{
-    try{
-       const board = await boardModel.getDetails(boardId)
-       if (!board) {
-        throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
-       }
+    try {
+    const board = await boardModel.getDetails(boardId)
+    if (!board) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
+    }
 
-       const resBoard = cloneDeep(board)
-       resBoard.columns.forEach(column =>{
-        column.cards = resBoard.cards.filter(card => card.columnId.equals(column._id))
-       })
+    const resBoard = cloneDeep(board)
 
-       delete resBoard.cards
+    if (Array.isArray(resBoard.columns) && Array.isArray(resBoard.cards)) {
+      resBoard.columns.forEach(column => {
+        column.cards = resBoard.cards.filter(card =>
+          card?.columnId?.toString() === column?._id?.toString()
+        )
+      })
+    }
 
-        return resBoard
+    delete resBoard.cards
+    return resBoard
     }catch(error) {
         throw error
     }
@@ -44,7 +48,7 @@ const update = async(boardId,reqBody) =>{
     try{
         const updateData = {
             ...reqBody,
-            upDatedAt: Date.now
+            updatedAt: Date.now()
         }
        const updatedBoard = await boardModel.update(boardId, updateData)
 
@@ -57,7 +61,7 @@ const moveCardToDifferentColumn = async(reqBody) =>{
     try{
         await columnModel.update(reqBody.prevColumnId, {
             cardOrderIds: reqBody.prevCardOrderIds,
-            updateAt: Date.now()
+            updatedAt: Date.now()
         
         })
         

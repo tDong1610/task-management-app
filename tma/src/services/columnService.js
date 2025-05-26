@@ -26,7 +26,7 @@ const update = async(columnId,reqBody) =>{
     try{
         const updateData = {
             ...reqBody,
-            upDatedAt: Date.now
+            updatedAt: Date.now()
         }
        const updatedColumn = await columnModel.update(columnId, updateData)
 

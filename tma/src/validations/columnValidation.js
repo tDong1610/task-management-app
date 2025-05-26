@@ -53,5 +53,6 @@ const deleteItem = async (req, res, next) => {
 
 export const columnValidation = {
   createNew,
-  update
+  update,
+  deleteItem
 }
