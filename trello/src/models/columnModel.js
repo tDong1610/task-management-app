@@ -13,8 +13,8 @@ const COLUMN_COLLECTION_SCHEMA = Joi.object({
     Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
   ).default([]),
 
-  createdAt: Joi.date().timestamp('javascript').default(Date.now),
-  updatedAt: Joi.date().timestamp('javascript').default(null),
+  createdAt: Joi.date().timestamp('javascript').default(() => Date.now()),
+  updatedAt: Joi.date().timestamp('javascript').allow().default(null),
   _destroy: Joi.boolean().default(false)
 })
 
@@ -24,22 +24,22 @@ const validateBeforeCreate = async(data) => {
 }
 
 const createNew = async (data) => {
-    try{
-      const validData = await validateBeforeCreate(data)
-      const newColumnAdd ={
-        ...validData,
-        boardId: new ObjectId(validData.boardId)
-      }
-      const createdColumn = await GET_DB.collection('COLUMN_COLLECTION_NAME').insertOne(newColumnAdd)
-      return createdColumn
-    }catch(error){
-        throw new Error(error)
+  try {
+    const validData = await validateBeforeCreate(data)
+    const newColumnAdd = {
+      ...validData,
+      boardId: new ObjectId(validData.boardId)
     }
+    const createdColumn = await GET_DB().collection(COLUMN_COLLECTION_NAME).insertOne(newColumnAdd)
+    return createdColumn
+  } catch (error) {
+    throw new Error(error)
+  }
 }
 const findOnebyId =async(id) => {
     try{
-        const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({
-            _id: new ObjectId()
+        const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOne({
+            _id: new ObjectId(id)
         })
         return result
     }catch(error) { throw new Error(error)}
@@ -51,33 +51,33 @@ const pushCardOrderIds = async (card) => {
       { $push: { cardOrderIds: new ObjectId(card._id) } },
       { returnDocument: 'after' }
     )
-    return result.values
+    return result.value
   }catch(error){
     throw new Error(error)
   }
 }
 const update = async (columnId, updateData) => {
   try{
-    ObjectId.key(updateData).forEach(fieldName => {
+    Object.keys(updateData).forEach(fieldName => {
       if (INVALID_UPDATE_FIELDS.includes(fieldName))
         delete updateData[fieldName]
     })
     if (updateData.cardOrderIds) {
-      updateData.cardOrderIds = updateData.cardOrderIds.map(_id => {new ObjectId(_id)})
+      updateData.cardOrderIds = updateData.cardOrderIds.map(_id => new ObjectId(_id))
     }
     const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(columnId), },
       { $set: updateData },
       { returnDocument: 'after' }
     )
-    return result
+    return result.value
   }catch(error){
     throw new Error(error)
   }
 }
 const deleteOneById =async(columnId) => {
     try{
-        const result = await GET_DB().collection(BOARD_COLLECTION_NAME).deleteOne({
+        const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).deleteOne({
             _id: new ObjectId(columnId)
         })
         return result

@@ -13,7 +13,7 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
   title: Joi.string().required().min(3).max(50).trim().strict(),
   slug: Joi.string().required().min(3).trim().strict(),
   description: Joi.string().required().min(3).max(256).trim().strict(),
-  type: Joi.string().valid(...BOARD_TYPES).required(),
+  type: Joi.string().valid(...Object.values(BOARD_TYPES)).required(),
 
   // Lưu ý các item trong mảng columnOrderIds là ObjectId nên cần thêm pattern cho chuẩn nhé, (lúc quay video số 57 mình quên nhưng sang đầu video số 58 sẽ có nhắc lại về cái này.)
   columnOrderIds: Joi.array().items(
@@ -34,7 +34,7 @@ const validateBeforeCreate = async(data) => {
 const createNew = async (data) => {
     try{
       const validData = await validateBeforeCreate(data)
-      const createdBoard = await GET_DB.collection('BOARD_COLLECTION_NAME').insertOne(validData)
+      const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
       return createdBoard
     }catch(error){
         throw new Error(error)
@@ -43,7 +43,7 @@ const createNew = async (data) => {
 const findOnebyId =async(id) => {
     try{
         const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({
-            _id: new ObjectId()
+            _id: new ObjectId(id)
         })
         return result
     }catch(error) { throw new Error(error)}
@@ -52,23 +52,23 @@ const findOnebyId =async(id) => {
 const getDetails =async(id) => {
     try{
         //const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({
-         //   _id: new ObjectId()
+         //   _id: new ObjectId(id)
         //})
         const result = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
           { $match: {
-            _id: new ObjectId(),
+            _id: new ObjectId(id),
             _destroy: false
           } },
           { $lookup: {
             from: columnModel.COLUMN_COLLECTION_NAME,
             localField: "_id",
-            foreigField: 'boardId',
+            foreignField: 'boardId',
             as: 'columns'
           } },
           { $lookup: {
             from: cardModel.CARD_COLLECTION_NAME,
             localField: "_id",
-            foreigField: 'boardId',
+            foreignField: 'boardId',
             as: 'cards'
           } },
         ]).toArray()
@@ -89,7 +89,7 @@ const pushColumnOrderIds = async (column) => {
 }
 const update = async (boardId, updateData) => {
   try{
-    ObjectId.key(updateData).forEach(fieldName => {
+    Object.keys(updateData).forEach(fieldName => {
       if (INVALID_UPDATE_FIELDS.includes(fieldName))
         delete updateData[fieldName]
     })

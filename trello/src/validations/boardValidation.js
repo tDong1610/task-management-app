@@ -2,6 +2,7 @@ import Joi from 'joi'
 import { StatusCodes } from 'http-status-codes'
 import ApiError from '../utils/ApiError.js'
 import { BOARD_TYPES } from '../utils/constants.js'
+import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '../utils/validators.js'
 
 const createNew = async (req, res, next) => {
   const correctCondition = Joi.object({
@@ -18,7 +19,8 @@ const createNew = async (req, res, next) => {
       'string.min': 'Description must be at least 3 characters',
       'string.max': 'Description must be at most 256 characters'
     }),
-    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
+    // Spread trên mảng giá trị, không phải object
+    type: Joi.string().valid(...Object.values(BOARD_TYPES)).required()
   })
 
   try {
@@ -28,13 +30,15 @@ const createNew = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
   }
 }
+
 const update = async (req, res, next) => {
   const correctCondition = Joi.object({
     title: Joi.string().min(3).max(50).trim().strict(),
     description: Joi.string().min(3).max(256).trim().strict(),
-    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE),
+    type: Joi.string().valid(...Object.values(BOARD_TYPES)),
     columnOrderIds: Joi.array().items(
-          Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
+      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+    )
   })
 
   try {
@@ -47,27 +51,28 @@ const update = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
   }
 }
+
 const moveCardToDifferentColumn = async (req, res, next) => {
   const correctCondition = Joi.object({
     currentCardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     prevColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-    prevCardOrderIds:Joi.array().required().items(
-          Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)),
-
+    prevCardOrderIds: Joi.array().required().items(
+      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+    ),
     nextColumnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-    nextCardOrderIds:Joi.array().required().items(
-          Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
+    nextCardOrderIds: Joi.array().required().items(
+      Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+    )
   })
 
   try {
-    await correctCondition.validateAsync(req.body, { 
-      abortEarly: false,
-    })
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
   }
 }
+
 export const boardValidation = {
   createNew,
   update,

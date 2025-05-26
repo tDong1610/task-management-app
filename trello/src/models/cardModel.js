@@ -22,30 +22,52 @@ const validateBeforeCreate = async(data) => {
 }
 
 const createNew = async (data) => {
-    try{
-      const validData = await validateBeforeCreate(data)
-      const newCardAdd ={
-        ...validData,
-        boardId: new ObjectId(validData.boardId),
-        columnId: new ObjectId(validData.columnId)
-      }
-      const createdCard = await GET_DB.collection('CARD_COLLECTION_NAME').insertOne(newCardAdd)
-      return createdCard
-    }catch(error){
-        throw new Error(error)
+  try {
+    console.log('Data before validation:', data)
+
+    const validData = await validateBeforeCreate(data)
+
+    const newCardAdd = {
+      ...validData,
+      boardId: new ObjectId(validData.boardId),
+      columnId: new ObjectId(validData.columnId)
     }
+
+    const createdCard = await GET_DB()
+      .collection(CARD_COLLECTION_NAME)
+      .insertOne(newCardAdd)
+
+    if (!createdCard.acknowledged) {
+      throw new Error('Failed to create new card')
+    }
+
+    return createdCard
+  } catch (error) {
+    console.error('Error in createNew cardModel:', error)
+    throw error
+  }
 }
-const findOnebyId =async(boardId) => {
-    try{
-        const result = await GET_DB().collection(CARD_COLLECTION_NAMEARD_COLLECTION_NAME).findOne({
-            _id: new ObjectId()
-        })
-        return result
-    }catch(error) { throw new Error(error)}
+
+const findOnebyId = async (id) => {
+  try {
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).findOne({
+      _id: new ObjectId(id)
+    })
+
+    if (!result) {
+      throw new Error(`Card with id ${id} not found`)
+    }
+
+    return result
+  } catch (error) {
+    console.error('Error in findOnebyId cardModel:', error)
+    throw error
+  }
 }
+
 const update = async (cardId, updateData) => {
   try{
-    ObjectId.key(updateData).forEach(fieldName => {
+    Object.keys(updateData).forEach(fieldName => {
       if (INVALID_UPDATE_FIELDS.includes(fieldName))
         delete updateData[fieldName]
     })
@@ -63,13 +85,17 @@ const update = async (cardId, updateData) => {
     throw new Error(error)
   }
 }
-const deleteManyById =async(columnId) => {
-    try{
-        const result = await GET_DB().collection(CARD_COLLECTION_NAMEARD_COLLECTION_NAME).deleteMany({
-            columnId: new ObjectId(columnId)
-        })
-        return result
-    }catch(error) { throw new Error(error)}
+const deleteManyById = async (columnId) => {
+  try {
+    const result = await GET_DB().collection(CARD_COLLECTION_NAME).deleteMany({
+      columnId: new ObjectId(columnId)
+    })
+
+    return result
+  } catch (error) {
+    console.error('Error in deleteManyById cardModel:', error)
+    throw error
+  }
 }
 
 export const cardModel = {
